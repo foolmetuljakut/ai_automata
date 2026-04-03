@@ -10,7 +10,11 @@ namespace core {
 namespace ca {
 class ICellularAutomaton;
 class ICellularAutomatonSimulation;
+class CellularAutomatonController;  // NEU
 }  // namespace ca
+namespace anns {
+class INeuralNetwork;  // NEU
+}  // namespace anns
 }  // namespace core
 }  // namespace autom
 
@@ -62,6 +66,10 @@ private:
     std::shared_ptr<autom::core::ca::ICellularAutomatonSimulation> m_simulation;
     std::shared_ptr<autom::core::ca::ICellularAutomaton> m_cell;
 
+    // Neural Networks für jede Zelle (NEU für Epic 4)
+    std::vector<std::shared_ptr<autom::core::anns::INeuralNetwork>> m_networks;
+    std::vector<std::shared_ptr<autom::core::ca::CellularAutomatonController>> m_controllers;
+
     // Render-Loop Parameter
     bool m_showSensors = false;
     bool m_showMotors = true;
@@ -87,11 +95,14 @@ private:
     void DrawCell(const std::shared_ptr<autom::core::ca::ICellularAutomaton>& cell, ImVec2 canvasPos);
     void DrawCellSensors(const std::shared_ptr<autom::core::ca::ICellularAutomaton>& cell, ImVec2 canvasPos);
     void DrawCellMotors(const std::shared_ptr<autom::core::ca::ICellularAutomaton>& cell, ImVec2 canvasPos);
-    void DrawFood(ImVec2 canvasPos);  // NEU
-    void DrawSimulationParameters();   // NEU
-    void DrawControlButtons();         // UMBENANNT (war DrawControlButtons)
-    void DrawCellParameters();         // UMBENANNT (war DrawDashboard)
-    void DrawDashboard();              // HELPER für alte Funktion
+    void DrawFood(ImVec2 canvasPos);
+    void DrawSimulationParameters();
+    void DrawControlButtons();
+    void DrawCellParameters();
+    void DrawDashboard();
+
+    // Neural Network Initialization (NEU Epic 4)
+    void InitializeNeuronsAndControllers(std::size_t count);
 };
 
 } // namespace gui

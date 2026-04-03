@@ -41,13 +41,20 @@ public:
     /// Bias für Output Layer
     virtual const Eigen::VectorXd& GetOutputBias() const = 0;
     virtual void SetOutputBias(const Eigen::VectorXd& bias) = 0;
+
+    // Forward Pass
+    virtual Eigen::VectorXd Forward(const Eigen::VectorXd& input) = 0;
+    virtual const Eigen::VectorXd& GetOutput() const = 0;
+
+    // Backward Pass (Backpropagation)
+    virtual void Backward(const Eigen::VectorXd& target, double learningRate) = 0;
 };
 
 /**
  * @brief Konkrete Implementierung eines neuronalen Netzwerks.
  *
  * Speichert Gewichte und Bias für ein einfaches Feed-Forward Netzwerk.
- * Struktur: Input -> Hidden -> Output
+ * Struktur: Input -> Hidden (ReLU) -> Output (Linear)
  */
 class NeuralNetwork : public INeuralNetwork {
 public:
@@ -75,15 +82,36 @@ public:
     const Eigen::VectorXd& GetOutputBias() const override;
     void SetOutputBias(const Eigen::VectorXd& bias) override;
 
+    // Forward Pass
+    Eigen::VectorXd Forward(const Eigen::VectorXd& input) override;
+    const Eigen::VectorXd& GetOutput() const override;
+
+    // Backward Pass (Backpropagation) - nur eine Iteration
+    void Backward(const Eigen::VectorXd& target, double learningRate) override;
+
 private:
     std::size_t m_inputCount;
     std::size_t m_hiddenCount;
     std::size_t m_outputCount;
 
+    // Weights & Bias
     Eigen::MatrixXd m_inputToHiddenWeights;
     Eigen::VectorXd m_hiddenBias;
     Eigen::MatrixXd m_hiddenToOutputWeights;
     Eigen::VectorXd m_outputBias;
+
+    // Cached activations (für Backward Pass)
+    Eigen::VectorXd m_lastInput;
+    Eigen::VectorXd m_hiddenActivation;  // Nach ReLU
+    Eigen::VectorXd m_hiddenLinear;      // Vor ReLU (für Backprop)
+    Eigen::VectorXd m_output;             // Final output
+
+    // ReLU Aktivierungsfunktion
+    Eigen::VectorXd ReLU(const Eigen::VectorXd& x) const;
+    Eigen::VectorXd ReLUDerivative(const Eigen::VectorXd& activated) const;
+
+    // Clamp output zu [-1, 1]
+    Eigen::VectorXd ClampOutput(const Eigen::VectorXd& output) const;
 };
 
 } // namespace anns

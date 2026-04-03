@@ -1,0 +1,17 @@
+da wir jetzt eine gui und simulation haben, können wir jetzt die zell-logik implementieren.
+die zelle bekommt jetzt noch eine rotation, die allerdings nicht von der zelle gesteuert wird, sondern die zelle richtet sich entlang ihres velocity-vektors aus indem sie ihre input kanäle entsprechend dreht.
+hierfür soll die richtung des velocity-vektors an das ergebnis des neuronalen netzes gebunden werden.
+der output des netzes soll sich zwischen -1 und 1 bewegen und zwei komponenten haben und auf länge 1 geclamped in den velocity-vektor geschrieben werden.
+der input sollen die messungen der sensorik sein.
+ein punkt in der ebene vor der zelle, soll in einen der sensorik-kanäle nach abstand zur zelle eingetragen werden.
+wird kein kanal gefunden, soll kein kanal beschrieben werden.
+das neuronale netz soll aktuell einfach feed-forward betreiben.
+weiterhin soll für das neuronale netz ein backpropagation algorithmus implementiert werden.
+dieser soll dann überhaupt nur aktiv werden, wenn die zelle zu lange ein futter stückchen sieht, aber es nicht mittig ansteuert,
+d.h. das futter stückchen soll idealerweile von dem mittleren sensorkanal erfasst werden. da die zelle ihre sensoren entsprechend des vektors dreht, richtet sich die zelle auf das futterstückchen aus.
+der backpropagation algorithmus soll dann nur gemäß der flexibilität der zelle einfluss haben.
+die flexibilität soll dabei zwischen 0 und 1 liegen und graduell gegen 0 gehen.
+
+hierfür brauchen wir auch immer unittests, die die neuronalen netze rausmocken, damit wir die zell-logik testen können.
+wir brauchen nur einen manuellen test: ich prüfe, ob sich die einzelne zelle entsprechend bewegt.
+ich erwarte dann, dass eine zelle mit random-neuronalem netz, einer zwischenschicht und 2 output-neuronen, sich entsprechend der sensorik ausrichtet und auf das futterstückchen zubewegt.
