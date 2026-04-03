@@ -6,12 +6,19 @@ find_package(Catch2 REQUIRED)
 file(GLOB_RECURSE TEST_SOURCES "*.cpp")
 
 # Define target
-add_executable(ai_automata_tests ${TEST_SOURCES} ${CMAKE_SOURCE_DIR}/src/math/NeuralMath.cpp)
+# Include all source files: tests + mocks + core implementations
+add_executable(ai_automata_tests
+    ${TEST_SOURCES}
+    ${CMAKE_SOURCE_DIR}/src/math/NeuralMath.cpp
+    ${CMAKE_SOURCE_DIR}/src/core/ca/CellularAutomaton.cpp
+    ${CMAKE_SOURCE_DIR}/src/core/anns/NeuralNetwork.cpp
+)
 
 # Target properties
 target_compile_features(ai_automata_tests PRIVATE cxx_std_17)
 target_include_directories(ai_automata_tests PRIVATE
     ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/test
     ${CMAKE_SOURCE_DIR}/../imgui
 )
 

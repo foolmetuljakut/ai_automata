@@ -3,3 +3,4 @@ html/
 latex/
 build_rpm/
 *.list
+.idea/

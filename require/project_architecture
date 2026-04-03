@@ -1,0 +1,17 @@
+- wir simulieren zelluläre automaten, die in einer 2d-umgebung leben
+- die zellen tragen eine sensorik, ein neuronales netz und eine motorik
+- die sensorik besteht aus keilförmigen sensorzellen, die in einem konfigurierbaren winkel um die zelle herum angeordnet sind
+- die sensorik kann zwischen futter und anderen zellen unterscheiden
+- das neuronale netz hat eine konfigurierbare flexibilität
+- das neuronale netz kann zwischen zwei generationen über einen genetischen algorithmus weitergegeben und modifiziert werden
+- die motorik ist ein richtungsvektor, der die bewegungsrichtung und geschwindigkeit der zelle bestimmt
+- die gui repräsentiert die zellen als kreise, die in der 2d-umgebung herumlaufen
+- die gui zeigt den bewegungsvektor der zellen an
+- die gui zeigt die sensorischen eingaben der zellen an
+- die gui zeigt den score der zellen an, der die anzahl gefressener futterstückchen pro zeit darstellt
+- die gui ermöglicht es, die simulation zu starten, zu pausieren und zurückzusetzen
+- die gui erlaubt parameter für die zellen zu konfigurieren, d.h. die sensorische reichweite, die sensorischen winkel, die anzahl der versteckten neuronen, die flexibilität des neuronalen netzes, die geschwindigkeit der zellen
+- die gui erlaubt parameter für den genetischen algorithmus zu konfigurieren, d.h. die mutationsrate des genetischen algorithmus
+- die gui erlaubt parameter für die simulation zu konfigurieren, d.h. und die anzahl der generationen, die anzahl der zellen, die anzahl der gleichzeitig existierenden futterstückchen, die dauer einer generation
+- der genetische algorithmus selektiert die besten zellen einer generation basierend auf ihrem score, verwirft zellen mit nicht gesteigerten scores, kreuzt und mutiert sie, um die nächste generation zu erzeugen
+- die simulation läuft über mehrere generationen, wobei die zellen in jeder generation versuchen, ihre performance zu verbessern, um mehr futter pro zeit zu fressen
