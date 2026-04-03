@@ -69,8 +69,13 @@ private:
     double m_deltaTime = 0.016;  // ~60 FPS default
 
     // Spielfläche Parameter
-    float m_playgroundWidth = 600.0f;  // Reduziert von 800 für besseres Layout
-    float m_playgroundHeight = 400.0f; // Reduziert von 600 für besseres Layout
+    float m_playgroundWidth = 600.0f;
+    float m_playgroundHeight = 400.0f;
+
+    // Simulations-Parameter (NEU für Epic 3)
+    int m_cellCount = 1;
+    int m_foodCount = 20;
+    float m_generationDuration = 1.0f;
 
     // Dashboard Parameter (für später)
     float m_sensorRange = 100.0f;
@@ -82,8 +87,11 @@ private:
     void DrawCell(const std::shared_ptr<autom::core::ca::ICellularAutomaton>& cell, ImVec2 canvasPos);
     void DrawCellSensors(const std::shared_ptr<autom::core::ca::ICellularAutomaton>& cell, ImVec2 canvasPos);
     void DrawCellMotors(const std::shared_ptr<autom::core::ca::ICellularAutomaton>& cell, ImVec2 canvasPos);
-    void DrawDashboard();
-    void DrawControlButtons();
+    void DrawFood(ImVec2 canvasPos);  // NEU
+    void DrawSimulationParameters();   // NEU
+    void DrawControlButtons();         // UMBENANNT (war DrawControlButtons)
+    void DrawCellParameters();         // UMBENANNT (war DrawDashboard)
+    void DrawDashboard();              // HELPER für alte Funktion
 };
 
 } // namespace gui
