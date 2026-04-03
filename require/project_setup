@@ -1,0 +1,5 @@
+- entwicklung in c++
+- dokumentation im code via doxygen (installed)
+- unittesting mit Catch2 (installed)
+- graphische darstellung via Imgui (cloned parallel to project)
+- lineare algebra via Eigen (eigen3 installed)

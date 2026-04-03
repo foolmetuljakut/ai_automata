@@ -1,0 +1,6 @@
+- projekt pipeline für c++ code
+- identische strukturierung des codes zwischen src/ und test/
+- verarbeitung von linearer algebra für neuronale netzwerke
+- graphische darstellung von neuronalen netzwerken und live-einsatz im system
+- unit- und integrationstests für die entwickelten module via catch2
+- dokumentation der entwickelten module unter doc/

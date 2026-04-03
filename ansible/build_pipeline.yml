@@ -1,0 +1,60 @@
+#!/usr/bin/env ansible-playbook
+---
+- name: Build AI Automata Pipeline
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  
+  vars:
+    project_dir: "{{ playbook_dir }}/../"
+
+  tasks:
+    - name: Cleanup build directory
+      ansible.builtin.command:
+        cmd: ./pipeline.sh cleanup
+        chdir: "{{ project_dir }}"
+      
+    - name: Configure CMake
+      ansible.builtin.command:
+        cmd: ./pipeline.sh configure_cmake
+        chdir: "{{ project_dir }}"
+
+    - name: Execute build
+      ansible.builtin.command:
+        cmd: ./pipeline.sh execute_build
+        chdir: "{{ project_dir }}"
+
+    - name: Code analysis (Clang-Tidy)
+      ansible.builtin.command:
+        cmd: ./pipeline.sh code_analysis
+        chdir: "{{ project_dir }}"
+
+    - name: Run unit tests
+      ansible.builtin.command:
+        cmd: ./pipeline.sh run_unit_tests
+        chdir: "{{ project_dir }}"
+
+    - name: Create coverage report
+      ansible.builtin.command:
+        cmd: ./pipeline.sh create_coverage_report
+        chdir: "{{ project_dir }}"
+
+    - name: Create documentation
+      ansible.builtin.command:
+        cmd: ./pipeline.sh create_documentation
+        chdir: "{{ project_dir }}"
+
+    - name: Create RPM package
+      ansible.builtin.command:
+        cmd: ./pipeline.sh create_rpm_package
+        chdir: "{{ project_dir }}"
+
+    - name: Ensure RPM artifacts exist
+      ansible.builtin.stat:
+        path: "{{ project_dir }}/build/x86_64/"
+      register: rpm_dir
+
+    - name: Verify build completion
+      ansible.builtin.debug:
+        msg: "Pipeline Succeeded! RPM package is available in {{ project_dir }}/build/x86_64/"
+      when: rpm_dir.stat.exists

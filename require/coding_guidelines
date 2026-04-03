@@ -1,0 +1,12 @@
+- Single Responsibility Principle (SRP): Jede Klasse, jedes Modul und jede Funktion hat genau einen klaren Grund, sich zu aendern.
+- Newspaper Principle: Von oben nach unten lesen wie eine Zeitung: erst das Wesentliche, dann die Details.
+- Kleine Funktionen: Funktionen sind kurz, tun genau eine Sache und sind leicht zu verstehen.
+- Sprechende Namen: Namen von Variablen, Funktionen und Klassen erklaeren die Absicht ohne Zusatzkommentare.
+- Kapselung von Komplexitaet: Komplexe Logik hinter klaren Schnittstellen verstecken.
+- Wenig Abhaengigkeiten: Module lose koppeln, damit Aenderungen lokal bleiben und Tests einfacher werden.
+- DRY (Don't Repeat Yourself): Wissen nur einmal ablegen, um Inkonsistenzen und Doppelpflege zu vermeiden.
+- Klare Schichten und Grenzen: Fachlogik, Infrastruktur und UI sauber trennen.
+- Fehler klar behandeln: Fehler frueh, eindeutig und reproduzierbar behandeln statt still zu schlucken.
+- Tests als Sicherheitsnetz: Automatisierte Tests sichern Verhalten bei Refactorings und neuen Features.
+- Boy-Scout-Rule: Hinterlasse den Code immer etwas sauberer, als du ihn vorgefunden hast.
+- Kontinuierliches Refactoring: Regelmaessig vereinfachen, statt technische Schulden wachsen zu lassen.
