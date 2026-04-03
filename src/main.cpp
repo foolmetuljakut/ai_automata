@@ -108,14 +108,23 @@ void InitializeImGui(GLFWwindow* window, const char* glsl_version)
 
 void RunMainLoop(GLFWwindow* window, autom::gui::MainWindow& mainWindow)
 {
+    double lastTime = glfwGetTime();
+
     while (!glfwWindowShouldClose(window))
     {
+        double currentTime = glfwGetTime();
+        double deltaTime = currentTime - lastTime;
+        lastTime = currentTime;
+
         glfwPollEvents();
 
         // Starte den ImGui Frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+
+        // Aktualisiere Simulation vor Rendering
+        mainWindow.UpdateSimulation(deltaTime);
 
         // UI Rendern (Trennung von UI und Business Logic)
         mainWindow.Render();

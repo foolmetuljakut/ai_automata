@@ -1,0 +1,7 @@
+- zelluläre automaten müssen in einer 2d-umgebung leben
+- zelluläre automaten müssen auf ihre umgebung reagieren können
+- zelluläre automaten müssen sich bewegen können
+- zelluläre automaten müssen in der umgebung futter finden können
+- zelluläre automaten müssen sich gegenseitig in der umgebung wahrnehmen können
+- die sensorik kann zwischen futter und anderen zellen unterscheiden
+- im laufe der simulationszeit muss sich die rate von gefressenen futterstückchen pro zeit pro automat monoton erhöhen

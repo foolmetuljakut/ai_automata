@@ -1,0 +1,7 @@
+wir nehmen eine kleine änderung vor: wir ersetzen die start/stop button durch einen "start/pause"-toggle button,
+das ist einfacher zu klicken. funktionalität bleibt gleich, aber es ist benutzerfreundlicher.
+weiterhin benennen wir den "Parameter:" string zu "Zell-Parameter".
+
+jetzt fügen wir die simulationsparameter hinzu. hierbei ist wichtig, dass mit einstellen der parameter
+auch wirklich die simulation beeinflusst wird. also zB das ändern der anzahl der zellen oder futter stückchen muss direkt sichtbar sein (->manuelle tests).
+die simulationsparameter sollen im dashboard oberhalb der zell-parameter angezeigt werden und der start/stop button bzw der save button sollen unter die simulations-parameter wandern.

@@ -1,0 +1,5 @@
+ok, wir erstellen als erstes eine dummy zelle unter /src/core/ca, ein neuronales netz unter src/core/anns, und in der gui eine "spielfläche" auf der eine zelle angezeigt werden kann. hierbei ist noch keine echte funktionalität geplant, nur das anlegen von feldern und organisieren eines durchstiches für den programmfluss.
+da die logik von gui und der simulation getrennt sein soll, kommt nur "aufrufender" code in die src/gui/ und die simulations-implementation (auch wieder nur klassen/felder ohne logik) unter src/core.
+unter src/math sollen wrapper für eigen3 rein, die mir das durchpropagieren von input durch ein neuronales netz erlaubt.
+um unittesting fähigkeit zu erlauben, soll entsprechend sauber geinterfaced werden, sodass wir mit mocks arbeiten können.
+in den unittests unter test/ soll der projektstruktur unter src von den ordnern und den source files her gefolgt werden. weiterhin sollen unter test/mocks/ auch wieder folgend der projekt-struktur mocks erstellt werden, wo nötig.
