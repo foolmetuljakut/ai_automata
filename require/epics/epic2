@@ -1,0 +1,7 @@
+als nächstes erweitern wir die gui. die spielfläche soll eine 2d fläche sein auf der gezeichnet werden kann.
+eine simulationsklasse unter src/core/ca soll einen update mechanismus kriegen.
+die simulation soll von der gui aufgerugen werden.
+in der gui sollen rechts am rand ein dashboard mit derzeitigen parametern und boxen für neue eingabewerte stehen (noch ohne funktion).
+in der gui sollte ich buttons für das starten, stoppen (ruft simulations update schleife auf) und speichern der simulation haben (noch ohne funktion).
+die gui soll auc heine render schleife haben, die die spielfläche aktualisiert.
+aktuell soll die spielfläche die eine zelle darstellen und buttons anbieten, um sensorik (also die sicht-keile) und motorik (den richtungsvektor) zu zeichnen.
