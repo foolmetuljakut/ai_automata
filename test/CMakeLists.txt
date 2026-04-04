@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 project(Tests)
 
+# Strict Compiler Flags for Code Quality
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wfatal-errors")
+
 find_package(Catch2 REQUIRED)
 
 file(GLOB_RECURSE TEST_SOURCES "*.cpp")

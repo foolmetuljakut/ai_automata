@@ -33,12 +33,12 @@ TEST_CASE("CellularAutomatonSimulation: State Management", "[simulation]") {
 
 TEST_CASE("CellularAutomatonSimulation: Update when STOPPED", "[simulation]") {
     auto cell = std::make_shared<autom::core::ca::CellularAutomaton>();
-    cell->SetPosition(0.0, 0.0);
-    cell->SetVelocity(1.0, 1.0);
 
     autom::core::ca::CellularAutomatonSimulation sim(cell);
 
     SECTION("Position does not change when STOPPED") {
+        sim.GetCell()->SetPosition(0.0, 0.0);
+        sim.GetCell()->SetVelocity(1.0, 1.0);
         sim.Update(1.0);  // deltaTime = 1.0
 
         double x, y;
@@ -50,13 +50,13 @@ TEST_CASE("CellularAutomatonSimulation: Update when STOPPED", "[simulation]") {
 
 TEST_CASE("CellularAutomatonSimulation: Update when RUNNING", "[simulation]") {
     auto cell = std::make_shared<autom::core::ca::CellularAutomaton>();
-    cell->SetPosition(10.0, 20.0);
-    cell->SetVelocity(5.0, -3.0);
 
     autom::core::ca::CellularAutomatonSimulation sim(cell);
     sim.SetState(autom::core::ca::CellularAutomatonSimulation::State::RUNNING);
 
     SECTION("Position updates correctly with velocity and deltaTime") {
+        sim.GetCell()->SetPosition(10.0, 20.0);
+        sim.GetCell()->SetVelocity(5.0, -3.0);
         sim.Update(2.0);  // deltaTime = 2.0
 
         double x, y;
@@ -69,6 +69,8 @@ TEST_CASE("CellularAutomatonSimulation: Update when RUNNING", "[simulation]") {
     }
 
     SECTION("Multiple updates accumulate") {
+        sim.GetCell()->SetPosition(10.0, 20.0);
+        sim.GetCell()->SetVelocity(5.0, -3.0);
         sim.Update(1.0);  // deltaTime = 1.0
         sim.Update(1.0);  // deltaTime = 1.0
 
@@ -84,13 +86,13 @@ TEST_CASE("CellularAutomatonSimulation: Update when RUNNING", "[simulation]") {
 
 TEST_CASE("CellularAutomatonSimulation: Update with zero velocity", "[simulation]") {
     auto cell = std::make_shared<autom::core::ca::CellularAutomaton>();
-    cell->SetPosition(5.0, 10.0);
-    cell->SetVelocity(0.0, 0.0);  // Keine Bewegung
 
     autom::core::ca::CellularAutomatonSimulation sim(cell);
     sim.SetState(autom::core::ca::CellularAutomatonSimulation::State::RUNNING);
 
     SECTION("Position remains unchanged with zero velocity") {
+        sim.GetCell()->SetPosition(5.0, 10.0);
+        sim.GetCell()->SetVelocity(0.0, 0.0);  // Keine Bewegung
         sim.Update(5.0);
 
         double x, y;

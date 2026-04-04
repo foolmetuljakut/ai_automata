@@ -2,6 +2,8 @@
 
 #include <memory>
 #include <vector>
+#include <random>
+#include <cmath>
 #include "CellularAutomaton.h"
 
 namespace autom {
@@ -119,6 +121,13 @@ private:
      * @brief Erstelle neue Zellen mit zufälligen Positionen.
      */
     void InitializeCells(std::size_t count);
+    void RandomizeCell(
+        std::shared_ptr<ICellularAutomaton> cell,
+        std::size_t i,
+        std::mt19937& gen,
+        std::uniform_real_distribution<>& disX,
+        std::uniform_real_distribution<>& disY,
+        std::uniform_real_distribution<>& disVel);
 
     /**
      * @brief Erstelle Futter-Punkte mit zufälligen Positionen.

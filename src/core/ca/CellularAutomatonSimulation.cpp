@@ -13,14 +13,6 @@ CellularAutomatonSimulation::CellularAutomatonSimulation(std::shared_ptr<ICellul
     InitializeFood(20);
 }
 
-void CellularAutomatonSimulation::SetState(State state) {
-    m_state = state;
-}
-
-CellularAutomatonSimulation::State CellularAutomatonSimulation::GetState() const {
-    return m_state;
-}
-
 void CellularAutomatonSimulation::Update(double deltaTime) {
     // Nur wenn Simulation läuft, aktualisiere die Zellen
     if (m_state != State::RUNNING) {
@@ -28,7 +20,6 @@ void CellularAutomatonSimulation::Update(double deltaTime) {
     }
 
     // Aktualisiere alle Zellen in m_cells
-    // TODO: Später mit generationDuration skalieren für variable Geschwindigkeit
     for (auto& cell : m_cells) {
         if (!cell) continue;
 
@@ -44,6 +35,63 @@ void CellularAutomatonSimulation::Update(double deltaTime) {
 
         cell->SetPosition(newX, newY);
     }
+}
+
+void CellularAutomatonSimulation::InitializeCells(std::size_t count) {
+    m_cells.clear();
+
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_real_distribution<> disX(50.0, m_playgroundWidth - 50.0);
+    std::uniform_real_distribution<> disY(50.0, m_playgroundHeight - 50.0);
+    std::uniform_real_distribution<> disVel(-50.0, 50.0);
+
+    // Wenn count == 1 und m_cell existiert bereits, nutze die original cell
+    if (count == 1 && m_cell) {
+        RandomizeCell(m_cell, 0, gen, disX, disY, disVel);
+        m_cells.push_back(m_cell);
+        return;
+    }
+
+    for (std::size_t i = 0; i < count; ++i) {
+        auto cell = std::make_shared<CellularAutomaton>();
+        RandomizeCell(cell, i, gen, disX, disY, disVel);
+        m_cells.push_back(cell);
+    }
+}
+
+void CellularAutomatonSimulation::RandomizeCell(
+std::shared_ptr<ICellularAutomaton> cell,
+std::size_t i,
+std::mt19937& gen,
+std::uniform_real_distribution<>& disX,
+std::uniform_real_distribution<>& disY,
+std::uniform_real_distribution<>& disVel) {
+    cell->SetId(i);
+    cell->SetPosition(disX(gen), disY(gen));
+    cell->SetVelocity(disVel(gen), -std::abs(disVel(gen)) / 2.0);  // Y negativ = oben
+    cell->SetScore(0);
+}
+
+void CellularAutomatonSimulation::InitializeFood(std::size_t count) {
+    m_foodItems.clear();
+
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_real_distribution<> disX(20.0, m_playgroundWidth - 20.0);
+    std::uniform_real_distribution<> disY(20.0, m_playgroundHeight - 20.0);
+
+    for (std::size_t i = 0; i < count; ++i) {
+        m_foodItems.emplace_back(disX(gen), disY(gen));
+    }
+}
+
+void CellularAutomatonSimulation::SetState(State state) {
+    m_state = state;
+}
+
+CellularAutomatonSimulation::State CellularAutomatonSimulation::GetState() const {
+    return m_state;
 }
 
 std::shared_ptr<ICellularAutomaton> CellularAutomatonSimulation::GetCell() const {
@@ -85,44 +133,6 @@ void CellularAutomatonSimulation::SetGenerationDuration(double duration) {
 
 double CellularAutomatonSimulation::GetGenerationDuration() const {
     return m_generationDuration;
-}
-
-void CellularAutomatonSimulation::InitializeCells(std::size_t count) {
-    m_cells.clear();
-
-    // Wenn count == 1 und m_cell existiert bereits, nutze die original cell
-    if (count == 1 && m_cell) {
-        m_cells.push_back(m_cell);
-        return;
-    }
-
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    std::uniform_real_distribution<> disX(50.0, m_playgroundWidth - 50.0);
-    std::uniform_real_distribution<> disY(50.0, m_playgroundHeight - 50.0);
-    std::uniform_real_distribution<> disVel(-50.0, 50.0);
-
-    for (std::size_t i = 0; i < count; ++i) {
-        auto cell = std::make_shared<CellularAutomaton>();
-        cell->SetId(i);
-        cell->SetPosition(disX(gen), disY(gen));
-        cell->SetVelocity(disVel(gen), -std::abs(disVel(gen)) / 2.0);  // Y negativ = oben
-        cell->SetScore(0);
-        m_cells.push_back(cell);
-    }
-}
-
-void CellularAutomatonSimulation::InitializeFood(std::size_t count) {
-    m_foodItems.clear();
-
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    std::uniform_real_distribution<> disX(20.0, m_playgroundWidth - 20.0);
-    std::uniform_real_distribution<> disY(20.0, m_playgroundHeight - 20.0);
-
-    for (std::size_t i = 0; i < count; ++i) {
-        m_foodItems.emplace_back(disX(gen), disY(gen));
-    }
 }
 
 } // namespace ca
