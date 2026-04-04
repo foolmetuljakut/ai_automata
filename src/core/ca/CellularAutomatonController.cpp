@@ -35,6 +35,7 @@ void CellularAutomatonController::Update(
     int closestSensor;
     UpdateSensors(targetPoint, sensorRange, sensorInputs, closestSensor);
     Eigen::VectorXd nnOutput = m_network->Forward(sensorInputs);
+    m_lastNNOutput = nnOutput;  // Speichere NN-Output für UpdateVelocity
     double targetAngle = ComputeTargetAngle(nnOutput, closestSensor);
     UpdateAngleInterpolation(targetAngle);
     UpdateVelocity();
@@ -113,9 +114,21 @@ void CellularAutomatonController::UpdateVelocity() {
         std::sin(m_currentAngle)
     );
 
-    // Velocity basierend auf persistenter Richtung
-    // Scale: 50 Pixel/Sekunde
-    Eigen::Vector2d newVelocity = directionVector * 50.0;
+    // Berechne Magnitude des NN-Outputs (für Geschwindigkeit)
+    double outputMagnitude = std::sqrt(
+        m_lastNNOutput(0) * m_lastNNOutput(0) +
+        m_lastNNOutput(1) * m_lastNNOutput(1)
+    );
+
+    // Skaliere Magnitude mit Max-Geschwindigkeit
+    // Max: 50 Pixel/Sekunde
+    double velocityMagnitude = outputMagnitude * 50.0;
+    if (velocityMagnitude > 50.0) {
+        velocityMagnitude = 50.0;  // Cap at 50 pixels/second
+    }
+
+    // Velocity = Richtung * Betrag
+    Eigen::Vector2d newVelocity = directionVector * velocityMagnitude;
     m_cell->SetVelocity(newVelocity(0), newVelocity(1));
 }
 

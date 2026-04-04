@@ -16,6 +16,8 @@ add_executable(ai_automata_tests
     ${CMAKE_SOURCE_DIR}/src/core/ca/CellularAutomaton.cpp
     ${CMAKE_SOURCE_DIR}/src/core/ca/CellularAutomatonSimulation.cpp
     ${CMAKE_SOURCE_DIR}/src/core/anns/NeuralNetwork.cpp
+    ${CMAKE_SOURCE_DIR}/src/core/ga/GeneticOperations.cpp
+    ${CMAKE_SOURCE_DIR}/src/core/ga/GeneticAlgorithm.cpp
 )
 
 # Target properties

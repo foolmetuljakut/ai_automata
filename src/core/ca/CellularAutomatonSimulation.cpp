@@ -33,7 +33,54 @@ void CellularAutomatonSimulation::Update(double deltaTime) {
         double newX = x + vx * deltaTime;
         double newY = y + vy * deltaTime;
 
+        // === BOUNDARY WRAPPING (Toroidal World) ===
+        // Wenn Zelle über Grenze hinausgeht, kommt sie von der anderen Seite wieder heraus
+        if (newX < 0.0) {
+            newX += m_playgroundWidth;
+        } else if (newX > m_playgroundWidth) {
+            newX -= m_playgroundWidth;
+        }
+
+        if (newY < 0.0) {
+            newY += m_playgroundHeight;
+        } else if (newY > m_playgroundHeight) {
+            newY -= m_playgroundHeight;
+        }
+
         cell->SetPosition(newX, newY);
+
+        // === FOOD COLLECTION ===
+        // Prüfe, ob Zelle Futter-Punkte erreicht hat (innerhalb eines Radiusses von ~15 Pixeln)
+        const double foodCollectionRadius = 15.0;
+
+        // Iteriere durch Futter und sammle auf, wenn Zelle in Reichweite ist
+        for (auto it = m_foodItems.begin(); it != m_foodItems.end(); ) {
+            double foodX = it->x;
+            double foodY = it->y;
+
+            double dx = newX - foodX;
+            double dy = newY - foodY;
+            double distance = std::sqrt(dx * dx + dy * dy);
+
+            if (distance <= foodCollectionRadius) {
+                // Futter aufgesammelt!
+                std::size_t currentScore = cell->GetScore();
+                cell->SetScore(currentScore + 1);
+
+                // Entferne Futter von der Liste
+                it = m_foodItems.erase(it);
+
+                // Spawne neues Futter an zufälliger Position
+                static std::random_device rd;
+                static std::mt19937 gen(rd());
+                std::uniform_real_distribution<> disX(20.0, m_playgroundWidth - 20.0);
+                std::uniform_real_distribution<> disY(20.0, m_playgroundHeight - 20.0);
+
+                m_foodItems.emplace_back(disX(gen), disY(gen));
+            } else {
+                ++it;
+            }
+        }
     }
 }
 

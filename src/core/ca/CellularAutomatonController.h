@@ -99,6 +99,9 @@ private:
     double m_currentAngle = 0.0;  // Aktuelle Bewegungs-Richtung in Radians
     const double ANGLE_INTERPOLATION = 0.05;  // 5% pro Frame = smooth curve
 
+    // NN Output für Geschwindigkeit (für velocity magnitude berechnung)
+    Eigen::VectorXd m_lastNNOutput = Eigen::VectorXd::Zero(2);  // Speichert letzten NN-Output
+
 
     /**
      * @brief Generiere neue zufällige Explorations-Richtung

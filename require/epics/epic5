@@ -1,0 +1,15 @@
+als nächstes kümmern wir uns um den genetischen algorithmus.
+hier kommt auch die generationsdauer ins spiel, die du schon angelegt hast.
+die generationsdauer ist die zeit, die eine generation an zeit bekommt, um sich zu entwickeln.
+anschließend werden unperformante kandidaten aussortiert (also die, die keine verbesserung im score zu vorher erzielt haben)
+und unter den übrigen kandidaten werden neue durch kreuzung und mutation erzeugt.
+die kreuzung erfolgt durch auswahl der neuronalen netze von zwei eltern. hierbei werden die neuronalen netze vektorisiert/linearisiert
+und zufällige abschnitte des vektors werden von einem oder dem andern elternteil übernommen.
+die mutation erfolgt durch zufällige änderung von einzelnen werten im vektor, um neue variationen zu erzeugen.
+der offspring erhält dann ein neuronales netz, was wieder aus dem vektor zurücktransformiert wird.
+die mutationswahrscheinlichkeit kann dabei als parameter eingestellt werden.
+der defaultwert der mutationswahrscheinlichkeit soll bei 1e-3 pro automaton pro generation liegen.
+
+weiterhin: die futterstückchen sollen, wenn sie von der zelle erreicht werden (innerhalb ihres radiusses) aufgesammelt und von der spielfläche entfernt werden.
+dafür soll ein neues futterstück zufällig plaziert werden.
+auch sollen die boundaries der spielfläche in alle richtungen loopend werden, zB dass zellen die die obere grenze überschreiten, unten wieder rauskommen.
