@@ -10,14 +10,18 @@ CellularAutomaton::CellularAutomaton()
       m_sensorInputs(Eigen::VectorXd::Zero(5)), m_flexibility(1.0), m_score(0), m_id(0) {
 }
 
-void CellularAutomaton::SetPosition(double x, double y) {
-    m_x = x;
-    m_y = y;
+void CellularAutomaton::ReduceFlexibility(double rate) {
+    m_flexibility -= rate;
+    if (m_flexibility < 0.0) {
+        m_flexibility = 0.0;
+    }
 }
 
-void CellularAutomaton::GetPosition(double& x, double& y) const {
-    x = m_x;
-    y = m_y;
+void CellularAutomaton::SetSensorInputs(const Eigen::VectorXd& inputs) {
+    // Kopiere nur wenn Größe passt
+    if (inputs.size() == 5) {
+        m_sensorInputs = inputs;
+    }
 }
 
 void CellularAutomaton::SetVelocity(double vx, double vy) {
@@ -27,6 +31,16 @@ void CellularAutomaton::SetVelocity(double vx, double vy) {
     // Berechne Rotation basierend auf Velocity
     // atan2(vy, vx) gibt Winkel in Radians
     m_rotation = std::atan2(vy, vx);
+}
+
+void CellularAutomaton::SetPosition(double x, double y) {
+    m_x = x;
+    m_y = y;
+}
+
+void CellularAutomaton::GetPosition(double& x, double& y) const {
+    x = m_x;
+    y = m_y;
 }
 
 void CellularAutomaton::GetVelocity(double& vx, double& vy) const {
@@ -42,13 +56,6 @@ double CellularAutomaton::GetRotation() const {
     return m_rotation;
 }
 
-void CellularAutomaton::SetSensorInputs(const Eigen::VectorXd& inputs) {
-    // Kopiere nur wenn Größe passt
-    if (inputs.size() == 5) {
-        m_sensorInputs = inputs;
-    }
-}
-
 const Eigen::VectorXd& CellularAutomaton::GetSensorInputs() const {
     return m_sensorInputs;
 }
@@ -60,13 +67,6 @@ void CellularAutomaton::SetFlexibility(double flex) {
 
 double CellularAutomaton::GetFlexibility() const {
     return m_flexibility;
-}
-
-void CellularAutomaton::ReduceFlexibility(double rate) {
-    m_flexibility -= rate;
-    if (m_flexibility < 0.0) {
-        m_flexibility = 0.0;
-    }
 }
 
 void CellularAutomaton::SetScore(std::size_t score) {

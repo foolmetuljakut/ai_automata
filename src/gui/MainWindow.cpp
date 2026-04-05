@@ -3,12 +3,16 @@
 #include <Eigen/Dense>
 #include <memory>
 #include <cmath>
+#include <random>
+#include <limits>
 
 #include "math/NeuralMath.h"
 #include "core/ca/CellularAutomaton.h"
 #include "core/ca/CellularAutomatonSimulation.h"
 #include "core/ca/CellularAutomatonController.h"
 #include "core/anns/NeuralNetwork.h"
+#include "core/ga/GeneticAlgorithm.h"
+#include "core/ga/GeneticOperations.h"
 
 namespace autom {
 namespace gui {
@@ -27,6 +31,15 @@ MainWindow::MainWindow() {
 
     // Initialisiere NNs und Controller für Zellen (NEU Epic 4)
     InitializeNeuronsAndControllers(m_cellCount);
+
+    // Initialisiere Genetischen Algorithmus (NEU Epic 5)
+    m_geneticAlgorithm = std::make_shared<autom::core::ga::GeneticAlgorithm>(
+        m_cellCount,
+        5,  // Input: 5 Sensoren
+        m_hiddenNeurons,
+        2,  // Output: 2 (Velocity X, Y)
+        m_mutationRate
+    );
 }
 
 void MainWindow::InitializeNeuronsAndControllers(std::size_t count) {
@@ -176,9 +189,20 @@ void MainWindow::DrawCell(const std::shared_ptr<autom::core::ca::ICellularAutoma
     // Zeichne Zellenkörper (Kreis)
     drawList->AddCircleFilled(cellScreenPos, cellRadius, cellColor);
 
-    // NEU: Zeichne Richtungsmarkierung (Dreieck) basierend auf Rotation
+    // NEU: Zeichne Richtungsmarkierung basierend auf Rotation und Geschwindigkeit
     double rotation = cell->GetRotation();
-    float arrowLength = 12.0f;
+
+    // Berechne Geschwindigkeit Betrag
+    double vx, vy;
+    cell->GetVelocity(vx, vy);
+    double velocityMagnitude = std::sqrt(vx * vx + vy * vy);
+
+    // Pfeil-Länge proportional zur Geschwindigkeit
+    // Min: 2px (bei v=0), Max: 50px (bei hoher Geschwindigkeit)
+    // Faktor 0.3 macht die Variation sichtbarer
+    float arrowLength = 2.0f + static_cast<float>(velocityMagnitude) * 0.3f;
+    if (arrowLength > 50.0f) arrowLength = 50.0f;  // Cap at 50px
+
     ImVec2 arrowTip(
         cellScreenPos.x + arrowLength * std::cos(rotation),
         cellScreenPos.y + arrowLength * std::sin(rotation)
@@ -196,7 +220,7 @@ void MainWindow::DrawCell(const std::shared_ptr<autom::core::ca::ICellularAutoma
     }
 
     // Debug-Info
-    ImGui::Text("ID: %zu | Pos: (%.1f, %.1f)", cell->GetId(), x, y);
+    ImGui::Text("ID: %zu | Score: %zu", cell->GetId(), cell->GetScore());
 }
 
 void MainWindow::DrawCellSensors(const std::shared_ptr<autom::core::ca::ICellularAutomaton>& cell, ImVec2 canvasPos) {
@@ -301,22 +325,40 @@ void MainWindow::DrawSimulationParameters() {
     int oldFoodCount = m_foodCount;
     float oldGenDuration = m_generationDuration;
 
-    ImGui::SliderInt("Zellanzahl##cells", &m_cellCount, 1, 10);
+    ImGui::SliderInt("Zellanzahl##cells", &m_cellCount, 2, 10);  // Minimum: 2 Zellen
     ImGui::SliderInt("Futter-Stueckchen##food", &m_foodCount, 10, 100);
-    ImGui::SliderFloat("Generations-Dauer##duration", &m_generationDuration, 0.5f, 10.0f);
+    ImGui::SliderFloat("Generations-Dauer (s)##duration", &m_generationDuration, 5.0f, 120.0f);  // 5-120 Sekunden
 
     ImGui::PopItemWidth();
+
+    // Textfeld für verbleibende Zeit
+    double remainingTime = m_generationDuration - m_currentGenerationElapsedTime;
+    if (remainingTime < 0.0) remainingTime = 0.0;
+    ImGui::Text("Verbleibende Zeit: %.2f / %.1f s", remainingTime, m_generationDuration);
+
+    // Textfeld für aktuelle Generation
+    ImGui::Text("Generation: %d", m_currentGeneration);
 
     // Sofort Simulation updaten wenn Parameter ändern
     if (oldCellCount != m_cellCount && m_simulation) {
         m_simulation->SetCellCount(m_cellCount);
         InitializeNeuronsAndControllers(m_cellCount);  // NEU: Reinitialisiere NNs
+
+        // NEU für Epic 5: Reinitialisiere GA bei Cell Count Änderung
+        m_geneticAlgorithm = std::make_shared<autom::core::ga::GeneticAlgorithm>(
+            m_cellCount,
+            5,  // Input: 5 Sensoren
+            m_hiddenNeurons,
+            2,  // Output: 2 (Velocity X, Y)
+            m_mutationRate
+        );
     }
     if (oldFoodCount != m_foodCount && m_simulation) {
         m_simulation->SetFoodCount(m_foodCount);
     }
     if (oldGenDuration != m_generationDuration && m_simulation) {
         m_simulation->SetGenerationDuration(m_generationDuration);
+        m_currentGenerationElapsedTime = 0.0;  // Reset timer wenn Duration ändert
     }
 }
 
@@ -350,6 +392,18 @@ void MainWindow::DrawCellParameters() {
     ImGui::SliderFloat("Sensor Angle", &m_sensorAngle, 10.0f, 180.0f);
     ImGui::SliderInt("Hidden Neurons", &m_hiddenNeurons, 2, 32);
 
+    ImGui::Spacing();
+
+    ImGui::Text("Genetische Algorithmus:");
+    // Mutation Rate als logarithmischer Slider (1e-5 bis 1e-1)
+    float logMutationRate = static_cast<float>(std::log10(m_mutationRate));
+    ImGui::SliderFloat("Mutation Rate##ga", &logMutationRate, -5.0f, -1.0f, "%.1e");
+    m_mutationRate = std::pow(10.0, static_cast<double>(logMutationRate));
+
+    if (m_geneticAlgorithm) {
+        m_geneticAlgorithm->SetMutationRate(m_mutationRate);
+    }
+
     ImGui::PopItemWidth();
 
     ImGui::Spacing();
@@ -379,6 +433,96 @@ void MainWindow::UpdateSimulation(double deltaTime) {
 
     // Syncronisiere m_simulationRunning mit Simulation State
     m_simulationRunning = (m_simulation->GetState() == autom::core::ca::CellularAutomatonSimulation::State::RUNNING);
+
+    // Tracking der Generation-Zeit
+    if (m_simulationRunning) {
+        m_currentGenerationElapsedTime += deltaTime;
+
+        // Wenn Generation vorbei ist: Generationswechsel durchführen
+        if (m_currentGenerationElapsedTime >= m_generationDuration) {
+            m_currentGenerationElapsedTime = 0.0;
+            m_currentGeneration++;  // Inkrementiere Generation Counter
+
+            // === GENERATION SWITCH mit GENETISCHEM ALGORITHMUS ===
+
+            // 1. Setze Fitness (Score) in GA für alle Zellen
+            // WICHTIG: Nur für Zellen iterieren, die auch in der GA sind!
+            std::size_t gaPopSize = m_geneticAlgorithm ? m_geneticAlgorithm->GetPopulationSize() : 0;
+            std::size_t cellCount = m_simulation->GetCellCount();
+
+            // Prüfe Konsistenz
+            if (gaPopSize != cellCount) {
+                // GA nicht synchronisiert - das sollte nicht passieren!
+                // Reinitialize GA mit aktueller Cell Count
+                m_geneticAlgorithm = std::make_shared<autom::core::ga::GeneticAlgorithm>(
+                    cellCount, 5, m_hiddenNeurons, 2, m_mutationRate
+                );
+                gaPopSize = cellCount;
+            }
+
+            for (std::size_t i = 0; i < gaPopSize && i < cellCount; ++i) {
+                auto cell = m_simulation->GetCellAt(i);
+                if (cell) {
+                    double score = static_cast<double>(cell->GetScore());
+                    m_geneticAlgorithm->SetIndividualFitness(i, score);
+                }
+            }
+
+            // 2. Führe GA-Generationsschritt durch:
+            //    - Selection: Behalte nur Zellen mit Score-Verbesserung
+            //    - Reproduction: Erzeuge neue durch Crossover + Mutation
+            m_geneticAlgorithm->ExecuteGenerationStep();
+
+            // 3. Update NN in m_networks mit neuen GA-Ergebnissen
+            for (std::size_t i = 0; i < gaPopSize; ++i) {
+                if (i >= m_networks.size() || i >= m_controllers.size()) {
+                    // Größe wurde geändert, sollte nicht passieren aber defensive Programmierung
+                    break;
+                }
+
+                auto newNetwork = m_geneticAlgorithm->GetIndividualNetwork(i);
+                if (newNetwork) {
+                    m_networks[i] = newNetwork;
+
+                    // Update auch den Controller mit neuem Network
+                    auto cell = m_simulation->GetCellAt(i);
+                    if (cell) {
+                        m_controllers[i] = std::make_shared<autom::core::ca::CellularAutomatonController>(
+                            cell, newNetwork
+                        );
+                    }
+                }
+            }
+
+            // 4. Reset Zellen für neue Generation
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_real_distribution<> disX(50.0, m_playgroundWidth - 50.0);
+            std::uniform_real_distribution<> disY(50.0, m_playgroundHeight - 50.0);
+            std::uniform_real_distribution<> disVel(-50.0, 50.0);
+
+            for (std::size_t i = 0; i < m_simulation->GetCellCount(); ++i) {
+                auto cell = m_simulation->GetCellAt(i);
+                if (!cell) continue;
+
+                // Neue zufällige Position
+                cell->SetPosition(disX(gen), disY(gen));
+
+                // Neue zufällige Velocity
+                double vx = disVel(gen);
+                double vy = -std::abs(disVel(gen)) / 2.0;  // Y negativ = oben
+                cell->SetVelocity(vx, vy);
+
+                // WICHTIG: Score zurücksetzen für neue Generation
+                cell->SetScore(0);
+
+                // Reset Controller
+                if (i < m_controllers.size()) {
+                    m_controllers[i]->Reset();
+                }
+            }
+        }
+    }
 
     // Erste: Update Controller für jede Zelle (NEU Epic 4)
     if (m_simulationRunning && !m_controllers.empty()) {

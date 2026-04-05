@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 project(Tests)
 
+# Strict Compiler Flags for Code Quality
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wfatal-errors")
+
 find_package(Catch2 REQUIRED)
 
 file(GLOB_RECURSE TEST_SOURCES "*.cpp")
@@ -13,6 +16,8 @@ add_executable(ai_automata_tests
     ${CMAKE_SOURCE_DIR}/src/core/ca/CellularAutomaton.cpp
     ${CMAKE_SOURCE_DIR}/src/core/ca/CellularAutomatonSimulation.cpp
     ${CMAKE_SOURCE_DIR}/src/core/anns/NeuralNetwork.cpp
+    ${CMAKE_SOURCE_DIR}/src/core/ga/GeneticOperations.cpp
+    ${CMAKE_SOURCE_DIR}/src/core/ga/GeneticAlgorithm.cpp
 )
 
 # Target properties

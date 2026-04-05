@@ -4,6 +4,9 @@ project(ai_automata VERSION 1.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# Strict Compiler Flags for Code Quality
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wfatal-errors")
+
 # Directories
 if(NOT DEFINED IMGUI_DIR)
     set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/../imgui")

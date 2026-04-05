@@ -15,6 +15,9 @@ class CellularAutomatonController;  // NEU
 namespace anns {
 class INeuralNetwork;  // NEU
 }  // namespace anns
+namespace ga {
+class IGeneticAlgorithm;  // NEU für Epic 5
+}  // namespace ga
 }  // namespace core
 }  // namespace autom
 
@@ -70,6 +73,10 @@ private:
     std::vector<std::shared_ptr<autom::core::anns::INeuralNetwork>> m_networks;
     std::vector<std::shared_ptr<autom::core::ca::CellularAutomatonController>> m_controllers;
 
+    // Genetischer Algorithmus (NEU für Epic 5)
+    std::shared_ptr<autom::core::ga::IGeneticAlgorithm> m_geneticAlgorithm;
+    double m_mutationRate = 1e-3;  // Default mutation rate
+
     // Render-Loop Parameter
     bool m_showSensors = false;
     bool m_showMotors = true;
@@ -81,9 +88,11 @@ private:
     float m_playgroundHeight = 400.0f;
 
     // Simulations-Parameter (NEU für Epic 3)
-    int m_cellCount = 1;
+    int m_cellCount = 2;  // Minimum 2 Zellen
     int m_foodCount = 20;
-    float m_generationDuration = 1.0f;
+    float m_generationDuration = 30.0f;  // Default: 30 Sekunden
+    double m_currentGenerationElapsedTime = 0.0;  // Verstrichene Zeit in dieser Generation (NEU)
+    int m_currentGeneration = 0;  // Aktuelle Generation (NEU)
 
     // Dashboard Parameter (für später)
     float m_sensorRange = 100.0f;

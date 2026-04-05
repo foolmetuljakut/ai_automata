@@ -99,11 +99,67 @@ private:
     double m_currentAngle = 0.0;  // Aktuelle Bewegungs-Richtung in Radians
     const double ANGLE_INTERPOLATION = 0.05;  // 5% pro Frame = smooth curve
 
+    // NN Output für Geschwindigkeit (für velocity magnitude berechnung)
+    Eigen::VectorXd m_lastNNOutput = Eigen::VectorXd::Zero(2);  // Speichert letzten NN-Output
+
 
     /**
      * @brief Generiere neue zufällige Explorations-Richtung
      */
     void GenerateNewExplorationDirection();
+
+    /**
+     * @brief (Schritt 1) Aktualisiere Sensor-Inputs basierend auf Ziel-Position.
+     *
+     * @param targetPoint Position des Ziels
+     * @param sensorRange Reichweite der Sensoren
+     * @param outSensorInputs Gefüllter Vektor der Sensor-Eingaben
+     * @param outClosestSensor Index des nächsten Sensors (-1 wenn keiner sichtbar)
+     */
+    void UpdateSensors(
+        const Eigen::Vector2d& targetPoint,
+        float sensorRange,
+        Eigen::VectorXd& outSensorInputs,
+        int& outClosestSensor
+    );
+
+    /**
+     * @brief (Schritt 2-3) Berechne Ziel-Winkel aus NN-Output oder Exploration.
+     *
+     * @param nnOutput Output des Neuronalen Netzwerks
+     * @param closestSensor Index des nächsten Sensors
+     * @return Ziel-Winkel in Radians
+     */
+    double ComputeTargetAngle(
+        const Eigen::VectorXd& nnOutput,
+        int closestSensor
+    );
+
+    /**
+     * @brief (Schritt 3) Interpoliere aktuellen Winkel zum Ziel-Winkel.
+     *
+     * Erstellt smooth curves statt abrupter Richtungswechsel.
+     *
+     * @param targetAngle Gewünschter Winkel
+     */
+    void UpdateAngleInterpolation(double targetAngle);
+
+    /**
+     * @brief (Schritt 4) Aktualisiere Velocity basierend auf aktueller Richtung.
+     */
+    void UpdateVelocity();
+
+    /**
+     * @brief (Schritt 5) Führe optionales Backpropagation durch.
+     *
+     * Nur wenn ShouldLearn() true ist.
+     */
+    void UpdateLearning();
+
+    /**
+     * @brief (Schritt 6) Reduziere Flexibilität der Zelle.
+     */
+    void ReduceFlexibility();
 
     /**
      * @brief Berechne welcher Sensor "sieht" den Punkt.
